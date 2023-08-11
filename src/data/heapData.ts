@@ -3,7 +3,7 @@
 export type Dataset = { x: number; y: string; value: number | null }[]
 
 export const data:Dataset = [
-     {
+  {
     "x": 1,
     "y": "Lunes",
     "value": 100
