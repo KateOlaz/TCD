@@ -1,0 +1,27 @@
+/* CrimePickerStyles.css */
+
+.crime-picker-container {
+  margin: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+}
+
+.crime-picker-select {
+  margin: 10px;
+  padding: 5px;
+  width: 300px;
+}
+
+.crime-picker-button {
+  margin: 10px;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100px;
+  height: 40px;
+  margin-right: 10px;
+}
