@@ -19,6 +19,28 @@ const LineChartSyncCursor = ({ width = 700, height = 150 }) => {
         setCursorPosition={setCursorPosition}
         color={"#B6BC58"}
       />
+      <Heading as="h2" size="md" mb={1}>
+        2002
+      </Heading>
+      <LineChart
+        data={data2}
+        width={width}
+        height={height}
+        cursorPosition={cursorPosition}
+        setCursorPosition={setCursorPosition}
+        color={"#6689c6"}
+      />
+      <Heading as="h2" size="md" mb={1}>
+        2003
+      </Heading>
+      <LineChart
+        data={data2}
+        width={width}
+        height={height}
+        cursorPosition={cursorPosition}
+        setCursorPosition={setCursorPosition}
+        color={"#40BFBC"}
+      />
     </Box>
   );
 };

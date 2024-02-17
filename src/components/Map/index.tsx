@@ -1,51 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Plot from 'react-plotly.js';
 import * as d3 from 'd3';
-import { FeatureCollection } from 'geojson';
 
-type MapProps = {
-  width: number;
-  height: number;
-  geoData: FeatureCollection;
-  numData: { code: string; value: number }[];
-};
+const Map = () => {
+  const [selectedYear, setSelectedYear] = useState(2015);
+  const [outputContainer, setOutputContainer] = useState('');
+  const [beeMapFigure, setBeeMapFigure] = useState({});
 
-const Map = ({ width, height, geoData, numData }: MapProps) => {
-  var colorScale = d3
-    .scaleThreshold<number, string>()
-    .domain([100000, 1000000, 10000000, 30000000, 100000000, 500000000])
-    .range(d3.schemeBlues[7]);
+  useEffect(() => {
+    const updateGraph = async (optionSelected) => {
+      try {
+        console.log(optionSelected);
 
-  const projection = d3
-    .geoMercator()
-    .scale(width / 2 / Math.PI - 20)
-    .center([95, 60]);
+        setOutputContainer(`The year chosen by the user was: ${optionSelected}`);
 
-  const geoPathGenerator = d3.geoPath().projection(projection);
+        const response = await fetch("https://raw.githubusercontent.com/Coding-with-Adam/Dash-by-Plotly/master/Other/Dash_Introduction/intro_bees.csv");
+        const csvData = await response.text();
 
-  const allSvgPaths = geoData.features
-    .filter((shape) => shape.id !== 'ATA')
-    .map((shape) => {
-      const regionData = numData.find((region) => region.code === shape.id);
+        // Utiliza la función d3.csvParse para analizar los datos CSV
+        const data = d3.csvParse(csvData);
 
-      const color = regionData ? colorScale(regionData?.value) : 'lightgrey';
+        const dff = data.filter(item => item["Year"] === optionSelected && item["Affected by"] === "Varroa_mites");
 
-      return (
-        <path
-          key={shape.id}
-          d={geoPathGenerator(shape)}
-          stroke="lightGrey"
-          strokeWidth={0.5}
-          fill={color}
-          fillOpacity={1}
-        />
-      );
-    });
+        const fig = {
+          data: [{
+            type: 'choropleth',
+            locationmode: 'USA-states',
+            locations: dff.map(item => item['state_code']),
+            scope: 'usa',
+            z: dff.map(item => parseFloat(item["Pct of Colonies Impacted"])),
+            colorscale: 'YlOrRd',
+            hoverinfo: 'location+z',
+          }],
+          layout: {
+            title: "Bees Affected by Mites in the USA",
+            title_xanchor: "center",
+            title_font: { size: 24 },
+            title_x: 0.5,
+            geo: { scope: 'usa' },
+          },
+        };
+
+        setBeeMapFigure(fig);
+      } catch (error) {
+        console.error('Error updating graph:', error);
+      }
+    };
+
+    updateGraph(selectedYear);
+  }, [selectedYear]);
 
   return (
     <div>
-      <svg width={width} height={height}>
-        {allSvgPaths}
-      </svg>
+      <h1 style={{ textAlign: 'center' }}>Web Application Dashboards with Dash</h1>
+      <select
+        value={selectedYear}
+        style={{ width: "40%" }}
+        onChange={(e) => setSelectedYear(e.target.value)}
+      >
+        <option value={2015}>2015</option>
+        <option value={2016}>2016</option>
+        <option value={2017}>2017</option>
+        <option value={2018}>2018</option>
+      </select>
+      <div id='output_container'>{outputContainer}</div>
+      <Plot id='my_bee_map' data={beeMapFigure.data} layout={beeMapFigure.layout} />
     </div>
   );
 };
